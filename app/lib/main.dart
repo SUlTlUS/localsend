@@ -1,6 +1,7 @@
 import 'package:common/isolate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:localsend_app/config/init.dart';
 import 'package:localsend_app/config/init_error.dart';
 import 'package:localsend_app/config/theme.dart';
@@ -16,7 +17,6 @@ import 'package:localsend_app/widget/watcher/tray_watcher.dart';
 import 'package:localsend_app/widget/watcher/window_watcher.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 Future<void> main(List<String> args) async {
   final RefenaContainer container;
@@ -79,8 +79,7 @@ class LocalSendApp extends StatelessWidget {
               darkTheme: getTheme(colorMode, Brightness.dark, dynamicColors),
               themeMode: colorMode == ColorMode.oled ? ThemeMode.dark : themeMode,
               navigatorKey: Routerino.navigatorKey,
-              home: GlassPage(
-                useOwnLayer: false,
+              home: GlassBackdropScope(
                 child: RouterinoHome(
                   builder: () => const HomePage(
                     initialTab: HomeTab.receive,

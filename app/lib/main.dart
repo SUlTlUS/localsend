@@ -16,6 +16,7 @@ import 'package:localsend_app/widget/watcher/tray_watcher.dart';
 import 'package:localsend_app/widget/watcher/window_watcher.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 Future<void> main(List<String> args) async {
   final RefenaContainer container;
@@ -29,12 +30,17 @@ Future<void> main(List<String> args) async {
     return;
   }
 
+  await LiquidGlassWidgets.initialize();
+
   runApp(
-    RefenaScope.withContainer(
-      container: container,
-      child: TranslationProvider(
-        child: const LocalSendApp(),
+    LiquidGlassWidgets.wrap(
+      child: RefenaScope.withContainer(
+        container: container,
+        child: TranslationProvider(
+          child: const LocalSendApp(),
+        ),
       ),
+      adaptiveQuality: true,
     ),
   );
 }
@@ -56,8 +62,6 @@ class LocalSendApp extends StatelessWidget {
                 ref.redux(localIpProvider).dispatch(InitLocalIpAction());
                 break;
               case AppLifecycleState.detached:
-                // The main isolate is only exited when all child isolates are exited.
-                // https://github.com/localsend/localsend/issues/1568
                 ref.redux(parentIsolateProvider).dispatch(IsolateDisposeAction());
                 break;
               default:
@@ -75,10 +79,13 @@ class LocalSendApp extends StatelessWidget {
               darkTheme: getTheme(colorMode, Brightness.dark, dynamicColors),
               themeMode: colorMode == ColorMode.oled ? ThemeMode.dark : themeMode,
               navigatorKey: Routerino.navigatorKey,
-              home: RouterinoHome(
-                builder: () => const HomePage(
-                  initialTab: HomeTab.receive,
-                  appStart: true,
+              home: GlassPage(
+                useOwnLayer: false,
+                child: RouterinoHome(
+                  builder: () => const HomePage(
+                    initialTab: HomeTab.receive,
+                    appStart: true,
+                  ),
                 ),
               ),
             ),

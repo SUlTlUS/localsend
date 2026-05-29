@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:localsend_app/config/init.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
@@ -103,42 +104,46 @@ class _HomePageState extends State<HomePage> with Refena {
       child: ResponsiveBuilder(
         builder: (sizingInformation) {
           return Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBody: sizingInformation.isMobile,
             body: Row(
               children: [
                 if (!sizingInformation.isMobile)
                   Stack(
                     children: [
-                      NavigationRail(
-                        selectedIndex: vm.currentTab.index,
-                        onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
-                        extended: sizingInformation.isDesktop,
-                        backgroundColor: Theme.of(context).cardColorWithElevation,
-                        leading: sizingInformation.isDesktop
-                            ? Column(
-                                children: [
-                                  checkPlatform([TargetPlatform.macOS])
-                                      ? // considered adding some extra space so it looks more natural
-                                        SizedBox(height: 40)
-                                      : SizedBox(height: 20),
-                                  const Text(
-                                    'LocalSend',
-                                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  SizedBox(height: 20),
-                                ],
-                              )
-                            : checkPlatform([TargetPlatform.macOS])
-                            ? SizedBox(
-                                height: 20,
-                              )
-                            : null,
-                        destinations: HomeTab.values.map((tab) {
-                          return NavigationRailDestination(
-                            icon: Icon(tab.icon),
-                            label: Text(tab.label),
-                          );
-                        }).toList(),
+                      GlassContainer(
+                        child: NavigationRail(
+                          selectedIndex: vm.currentTab.index,
+                          onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
+                          extended: sizingInformation.isDesktop,
+                          backgroundColor: Colors.transparent,
+                          leading: sizingInformation.isDesktop
+                              ? Column(
+                                  children: [
+                                    checkPlatform([TargetPlatform.macOS])
+                                        ? // considered adding some extra space so it looks more natural
+                                          SizedBox(height: 40)
+                                        : SizedBox(height: 20),
+                                    const Text(
+                                      'LocalSend',
+                                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: 20),
+                                  ],
+                                )
+                              : checkPlatform([TargetPlatform.macOS])
+                              ? SizedBox(
+                                  height: 20,
+                                )
+                              : null,
+                          destinations: HomeTab.values.map((tab) {
+                            return NavigationRailDestination(
+                              icon: Icon(tab.icon),
+                              label: Text(tab.label),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       // makes the top draggable
                       Positioned(
@@ -166,7 +171,7 @@ class _HomePageState extends State<HomePage> with Refena {
                         Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
+                            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -183,11 +188,15 @@ class _HomePageState extends State<HomePage> with Refena {
               ],
             ),
             bottomNavigationBar: sizingInformation.isMobile
-                ? NavigationBar(
+                ? GlassBottomBar(
                     selectedIndex: vm.currentTab.index,
-                    onDestinationSelected: (index) => vm.changeTab(HomeTab.values[index]),
-                    destinations: HomeTab.values.map((tab) {
-                      return NavigationDestination(icon: Icon(tab.icon), label: tab.label);
+                    onTabSelected: (index) => vm.changeTab(HomeTab.values[index]),
+                    tabs: HomeTab.values.map((tab) {
+                      return GlassBottomBarTab(
+                        icon: Icon(tab.icon),
+                        activeIcon: Icon(tab.icon),
+                        label: tab.label,
+                      );
                     }).toList(),
                   )
                 : null,

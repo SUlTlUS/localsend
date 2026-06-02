@@ -1,0 +1,87 @@
+name: Manual Flutter APK Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_mode:
+        description: Flutter APK build mode
+        required: true
+        type: choice
+        default: debug
+        options:
+          - debug
+          - release
+      run_analyze:
+        description: Run flutter analyze before building
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-flutter-apk-build-${{ github.ref }}-${{ inputs.build_mode }}
+  cancel-in-progress: false
+
+jobs:
+  build-android-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show tool versions
+        run: |
+          flutter --version
+          dart --version
+          rustc --version
+          cargo --version
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        if: ${{ inputs.run_analyze }}
+        run: flutter analyze
+
+      - name: Build debug APK
+        if: ${{ inputs.build_mode == 'debug' }}
+        run: flutter build apk --debug
+
+      - name: Build release APK
+        if: ${{ inputs.build_mode == 'release' }}
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: localsend-${{ inputs.build_mode }}-apk
+          path: app/build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error

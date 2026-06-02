@@ -43,8 +43,7 @@ class _FavoriteEditDialogState extends State<FavoriteEditDialog> with Refena {
     _aliasController.text = widget.prefilledDevice?.alias ?? widget.favorite?.alias ?? '';
 
     ensureRef((ref) {
-      _portController.text =
-          widget.prefilledDevice?.port.toString() ?? widget.favorite?.port.toString() ?? ref.read(settingsProvider).port.toString();
+      _portController.text = widget.prefilledDevice?.port.toString() ?? widget.favorite?.port.toString() ?? ref.read(settingsProvider).port.toString();
     });
   }
 
@@ -193,11 +192,11 @@ class _FavoriteEditDialogState extends State<FavoriteEditDialog> with Refena {
                           .read(httpProvider)
                           .v2
                           .register(
-                        protocol: https ? ProtocolType.https : ProtocolType.http,
-                        ip: ip,
-                        port: port,
-                        payload: payload,
-                      );
+                            protocol: https ? ProtocolType.https : ProtocolType.http,
+                            ip: ip,
+                            port: port,
+                            payload: payload,
+                          );
 
                       final name = _aliasController.text.trim();
 
